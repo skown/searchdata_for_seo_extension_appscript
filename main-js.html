@@ -1,0 +1,93 @@
+<script>
+    // Load the Collapsible structure
+    document.addEventListener('DOMContentLoaded', function() {
+      
+      google.script.run.withSuccessHandler(showProperties)
+            .listSearchConsoleSites()
+      
+      const elems_collapsible = document.querySelectorAll('.collapsible');
+      const instances_collapsible = M.Collapsible.init(elems_collapsible);
+      const search_type = M.FormSelect.init(document.getElementById("search_type"));
+      const search_metrics = M.FormSelect.init(document.getElementById("search_metrics"));
+      const search_dimensions = M.FormSelect.init(document.getElementById("search_dimensions"));
+      const search_dimensions_filter = M.FormSelect.init(document.getElementById("search_dimensions_filter"));
+      const filter_operators = M.Autocomplete.init(document.getElementById("autocomplete-input"), {
+        data: {
+            "Contains": null,
+            "Equals": null,
+            "Not Contains": null,
+            "Not Equals": null,
+            "Including Regex": null,
+            "Excluding Regex": null
+        }
+      });
+      const elems = document.querySelectorAll('.datepicker');
+      const instances = M.Datepicker.init(elems, {
+        format: 'yyyy-mm-dd',
+        autoClose: true,
+        defaultDate: new Date(),
+        setDefaultDate: true,
+        showClearBtn: true
+      });
+    });
+
+    // Load the property data from GSC API
+    function showProperties(properties) {
+        const list_options = document.getElementById("gsc_properties")
+        properties.forEach(function(property) {
+          list_options.innerHTML += `<option value='${property}'>${property}</option>`;
+        });
+        const instances_select = M.FormSelect.init(list_options)
+    };
+    
+    // Add more filter in filter section using button
+    const filter_button = document.getElementById("filter button");
+    filter_button.addEventListener("click", addFilterSection);
+
+    function addFilterSection() {
+      const filter_section = document.getElementById("filter sections");
+      const new_div = document.createElement("div");
+      new_div.innerHTML = `
+              <div class="input-field col s12">
+                <select id="search_dimensions_filter_loaded">
+                  <option value="" disabled>Choose your option</option>
+                  <option value="country">Country</option>
+                  <option value="device">Device</option>
+                  <option value="page">Page</option>
+                  <option value="query">Query</option>
+                  <option value="searchAppearance">Search Appearance</option>
+                </select>
+                <label>Pick dimension</label>
+              </div>
+              <div class="row">
+                <div class="col s12">
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <i class="material-icons prefix">textsms</i>
+                      <input type="text" id="autocomplete-input-loaded" class="autocomplete">
+                      <label for="autocomplete-input-loaded">Autocomplete</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                  <input id="filter_text" type="text" class="validate">
+                  <label class="active" for="filter_text">Your query</label>
+                </div>
+              </div>
+      `
+      filter_section.appendChild(new_div);
+      const search_dimensions_filter_loaded = M.FormSelect.init(document.getElementById("search_dimensions_filter_loaded"));
+      const filter_operators_loaded = M.Autocomplete.init(document.getElementById("autocomplete-input-loaded"), {
+        data: {
+            "Contains": null,
+            "Equals": null,
+            "Not Contains": null,
+            "Not Equals": null,
+            "Including Regex": null,
+            "Excluding Regex": null
+        }
+      });
+    };
+</script>
